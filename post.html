@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ post.titulo }} - VozRD</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="logo"><img src="{{ url_for('static', filename='logo.png') }}" alt="VozRD" class="logo-img"></div>
+        <nav>
+            <a href="{{ url_for('inicio') }}">Inicio</a>
+        </nav>
+        <div style="display:flex; align-items:center; gap:16px;">
+            {% if current_user.is_authenticated %}
+            <span style="font-weight:800;">👋 {{ current_user.nombre_usuario }}</span>
+            <a href="{{ url_for('logout') }}" style="color:#756B5B; font-weight:700; text-decoration:none;">Salir</a>
+            {% else %}
+            <a href="{{ url_for('login') }}" style="color:#2B2620; font-weight:700; text-decoration:none;">Iniciar sesión</a>
+            <a href="{{ url_for('registro') }}" style="color:#2B2620; font-weight:700; text-decoration:none;">Registrarse</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <main>
+        <section class="feed" style="margin-top:35px;">
+
+            <!-- POST COMPLETO -->
+            <article class="post">
+                <div class="post-header">
+                    <div class="avatar">👤</div>
+                    <div>
+                        <strong>{{ post.autor }}</strong>
+                        <small>{{ post.fecha.strftime('%d/%m/%Y %H:%M') }} · {{ post.provincia }}</small>
+                    </div>
+                </div>
+
+                <span class="tag {{ post.tipo }}">{{ post.tipo.upper() }}</span>
+
+                <h3>{{ post.titulo }}</h3>
+                <p>{{ post.contenido }}</p>
+
+                {% if post.imagen %}
+                <div class="meme-box" style="background-image:url('{{ post.imagen }}'); background-size:cover; background-position:center;"></div>
+                {% endif %}
+
+                <div class="post-actions">
+                    <form method="POST" action="{{ url_for('dar_like', post_id=post.id) }}" style="margin:0;">
+                        <button type="submit">👍 {{ post.likes }}</button>
+                    </form>
+                    <button type="button">💬 {{ post.lista_comentarios|length }}</button>
+                    <button type="button" onclick="compartirPost('{{ url_for('ver_post', post_id=post.id, _external=True) }}', this)">↗️ Compartir</button>
+                </div>
+            </article>
+
+            <!-- COMENTARIOS -->
+            <div class="post" id="comentarios">
+                <h3 style="margin-bottom:18px;">Comentarios ({{ post.lista_comentarios|length }})</h3>
+
+                {% for comentario in post.lista_comentarios %}
+                <div style="padding:14px 0; border-top:1px solid #eee;">
+                    <strong>{{ comentario.autor }}</strong>
+                    <small style="color:#6b7280; margin-left:8px;">
+                        {{ comentario.fecha.strftime('%d/%m/%Y %H:%M') }}
+                    </small>
+                    <p style="margin-top:6px; color:#4b5563;">{{ comentario.contenido }}</p>
+                </div>
+                {% else %}
+                <p style="color:#6b7280;">Aún no hay comentarios. ¡Sé el primero en comentar!</p>
+                {% endfor %}
+
+                {% if current_user.is_authenticated %}
+                <form method="POST" action="{{ url_for('comentar', post_id=post.id) }}"
+                      style="display:flex; flex-direction:column; gap:12px; margin-top:20px;">
+                    <textarea name="contenido" placeholder="Escribe un comentario..." rows="3" required
+                        style="padding:10px; border:2px solid #2B2620; border-radius:10px; font-family:'Nunito', sans-serif;"></textarea>
+                    <button type="submit" class="btn-principal" style="margin-top:0; align-self:flex-start;">
+                        Comentar
+                    </button>
+                </form>
+                {% else %}
+                <p style="margin-top:20px; color:#756B5B;">
+                    <a href="{{ url_for('login') }}?next={{ request.path }}" style="color:#E15A4E; font-weight:800;">Inicia sesión</a>
+                    para dejar un comentario.
+                </p>
+                {% endif %}
+            </div>
+
+        </section>
+    </main>
+
+    <footer>
+        <p>VozRD — Periodismo ciudadano dominicano</p>
+        <small>Cada ciudadano es un reportero</small>
+    </footer>
+
+    <script>
+        function compartirPost(url, boton) {
+            navigator.clipboard.writeText(url).then(() => {
+                const textoOriginal = boton.textContent;
+                boton.textContent = "✅ Enlace copiado";
+                setTimeout(() => { boton.textContent = textoOriginal; }, 2000);
+            });
+        }
+    </script>
+
+</body>
+</html>

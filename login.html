@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar sesión - VozRD</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="logo"><img src="{{ url_for('static', filename='logo.png') }}" alt="VozRD" class="logo-img"></div>
+        <nav>
+            <a href="{{ url_for('inicio') }}">Inicio</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero" style="padding:40px 50px; max-width:480px; margin:40px auto 0;">
+            <div class="etiqueta">BIENVENIDO DE VUELTA</div>
+            <h1 style="font-size:32px;">Iniciar <span>sesión</span></h1>
+        </section>
+
+        <section class="feed" style="max-width:480px; margin:20px auto 0;">
+            <div class="post">
+
+                {% if error %}
+                <p style="background:#fee2e2; color:#991b1b; padding:12px; border-radius:8px; margin-bottom:16px; font-weight:700;">
+                    {{ error }}
+                </p>
+                {% endif %}
+
+                <form method="POST" style="display:flex; flex-direction:column; gap:16px;">
+                    <div>
+                        <label>Nombre de usuario</label><br>
+                        <input type="text" name="nombre_usuario" required
+                            style="width:100%; padding:10px; margin-top:5px; border:2px solid #2B2620; border-radius:10px; font-family:'Nunito', sans-serif;">
+                    </div>
+
+                    <div>
+                        <label>Contraseña</label><br>
+                        <input type="password" name="password" required
+                            style="width:100%; padding:10px; margin-top:5px; border:2px solid #2B2620; border-radius:10px; font-family:'Nunito', sans-serif;">
+                    </div>
+
+                    <button type="submit" class="btn-principal" style="margin-top:0;">
+                        Entrar
+                    </button>
+                </form>
+
+                <p style="margin-top:18px; color:#756B5B;">
+                    ¿No tienes cuenta?
+                    <a href="{{ url_for('registro') }}" style="color:#E15A4E; font-weight:800;">Regístrate aquí</a>
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>VozRD — Periodismo ciudadano dominicano</p>
+        <small>Cada ciudadano es un reportero</small>
+    </footer>
+
+</body>
+</html>

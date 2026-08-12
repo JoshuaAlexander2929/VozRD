@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VozRD - Foro Ciudadano</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <header class="navbar">
+        <div class="logo"><img src="{{ url_for('static', filename='logo.png') }}" alt="VozRD" class="logo-img"></div>
+        <nav>
+            <a href="{{ url_for('inicio') }}">Inicio</a>
+            <a href="{{ url_for('inicio', tipo='denuncia') }}">Denuncias</a>
+            <a href="{{ url_for('inicio', tipo='meme') }}">Memes</a>
+            <a href="#categorias">Categorías</a>
+        </nav>
+        <div style="display:flex; align-items:center; gap:16px;">
+            {% if current_user.is_authenticated %}
+            <span style="font-weight:800;">👋 {{ current_user.nombre_usuario }}</span>
+            <a href="{{ url_for('logout') }}" style="color:#756B5B; font-weight:700; text-decoration:none;">Salir</a>
+            {% else %}
+            <a href="{{ url_for('login') }}" style="color:#2B2620; font-weight:700; text-decoration:none;">Iniciar sesión</a>
+            <a href="{{ url_for('registro') }}" style="color:#2B2620; font-weight:700; text-decoration:none;">Registrarse</a>
+            {% endif %}
+            <a href="{{ url_for('publicar') }}" style="text-decoration:none">
+                <button class="btn-publicar">+ Publicar</button>
+            </a>
+        </div>
+    </header>
+
+    <main>
+
+        <!-- HERO -->
+        <section class="hero">
+            <div class="etiqueta">PERIODISMO CIUDADANO</div>
+            <h1>Las noticias que <span>los medios no cuentan</span></h1>
+            <p class="descripcion">
+                Un espacio donde cualquier dominicano puede reportar lo que pasa
+                en su barrio, su provincia o su calle. Sin filtros, sin censura.
+            </p>
+            <a href="#feed" style="text-decoration:none">
+                <button class="btn-principal">Ver publicaciones</button>
+            </a>
+        </section>
+
+        <!-- CATEGORÍAS -->
+        <section class="categorias" id="categorias">
+            <h2>Categorías</h2>
+            <div class="categoria-grid">
+                <a href="{{ url_for('inicio', tipo='denuncia') }}" style="text-decoration:none; color:inherit;">
+                    <div class="categoria {{ 'activa' if filtro_activo == 'denuncia' }}">
+                        📢
+                        <strong>Denuncias</strong>
+                        <small>Casos reportados por ciudadanos</small>
+                    </div>
+                </a>
+                <a href="{{ url_for('inicio', tipo='meme') }}" style="text-decoration:none; color:inherit;">
+                    <div class="categoria {{ 'activa' if filtro_activo == 'meme' }}">
+                        😂
+                        <strong>Memes</strong>
+                        <small>Humor sobre la actualidad</small>
+                    </div>
+                </a>
+                <a href="{{ url_for('inicio', tipo='infraestructura') }}" style="text-decoration:none; color:inherit;">
+                    <div class="categoria {{ 'activa' if filtro_activo == 'infraestructura' }}">
+                        🚧
+                        <strong>Infraestructura</strong>
+                        <small>Crecimiento económico y obras</small>
+                    </div>
+                </a>
+                <a href="{{ url_for('inicio', tipo='gobierno') }}" style="text-decoration:none; color:inherit;">
+                    <div class="categoria {{ 'activa' if filtro_activo == 'gobierno' }}">
+                        🏛️
+                        <strong>Gobierno</strong>
+                        <small>Políticas y funcionarios</small>
+                    </div>
+                </a>
+            </div>
+            {% if filtro_activo %}
+            <p style="margin-top:15px;">
+                Mostrando solo: <strong>{{ filtro_activo }}</strong> ·
+                <a href="{{ url_for('inicio') }}" style="color:#ef4444;">Ver todas</a>
+            </p>
+            {% endif %}
+        </section>
+
+        <!-- FEED -->
+        <section class="feed" id="feed">
+            <div class="feed-header">
+                <h2>Publicaciones recientes</h2>
+                <select>
+                    <option>Más recientes</option>
+                    <option>Más comentadas</option>
+                </select>
+            </div>
+
+            {% for post in publicaciones %}
+            <article class="post" id="post-{{ post.id }}">
+                <div class="post-header">
+                    <div class="avatar">👤</div>
+                    <div>
+                        <strong>{{ post.autor }}</strong>
+                        <small>{{ post.fecha.strftime('%d/%m/%Y %H:%M') }} · {{ post.provincia }}</small>
+                    </div>
+                </div>
+
+                <span class="tag {{ post.tipo }}">{{ post.tipo.upper() }}</span>
+
+                <h3>{{ post.titulo }}</h3>
+                <p>{{ post.contenido }}</p>
+
+                {% if post.imagen %}
+                <div class="meme-box" style="background-image:url('{{ post.imagen }}'); background-size:cover; background-position:center;"></div>
+                {% endif %}
+
+                <div class="post-actions">
+                    <form method="POST" action="{{ url_for('dar_like', post_id=post.id) }}" style="margin:0;">
+                        <button type="submit">👍 {{ post.likes }}</button>
+                    </form>
+                    <a href="{{ url_for('ver_post', post_id=post.id) }}" style="text-decoration:none;">
+                        <button type="button">💬 {{ post.lista_comentarios|length }}</button>
+                    </a>
+                    <button type="button" onclick="compartirPost('{{ url_for('ver_post', post_id=post.id, _external=True) }}', this)">↗️ Compartir</button>
+                </div>
+            </article>
+            {% endfor %}
+
+        </section>
+
+    </main>
+
+    <footer>
+        <p>VozRD — Periodismo ciudadano dominicano</p>
+        <small>Cada ciudadano es un reportero</small>
+    </footer>
+
+    <script>
+        function compartirPost(url, boton) {
+            navigator.clipboard.writeText(url).then(() => {
+                const textoOriginal = boton.textContent;
+                boton.textContent = "✅ Enlace copiado";
+                setTimeout(() => { boton.textContent = textoOriginal; }, 2000);
+            });
+        }
+    </script>
+
+</body>
+</html>

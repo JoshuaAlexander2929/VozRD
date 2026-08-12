@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Publicar - VozRD</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="logo"><img src="{{ url_for('static', filename='logo.png') }}" alt="VozRD" class="logo-img"></div>
+        <nav>
+            <a href="{{ url_for('inicio') }}">Inicio</a>
+        </nav>
+        <div style="display:flex; align-items:center; gap:16px;">
+            {% if current_user.is_authenticated %}
+            <span style="font-weight:800;">👋 {{ current_user.nombre_usuario }}</span>
+            <a href="{{ url_for('logout') }}" style="color:#756B5B; font-weight:700; text-decoration:none;">Salir</a>
+            {% else %}
+            <a href="{{ url_for('login') }}" style="color:#2B2620; font-weight:700; text-decoration:none;">Iniciar sesión</a>
+            <a href="{{ url_for('registro') }}" style="color:#2B2620; font-weight:700; text-decoration:none;">Registrarse</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <main>
+        <section class="hero" style="padding:40px 50px;">
+            <div class="etiqueta">NUEVA PUBLICACIÓN</div>
+            <h1 style="font-size:32px;">Comparte tu <span>reporte</span></h1>
+        </section>
+
+        <section class="feed">
+            <div class="post">
+                <p style="margin-bottom:16px; color:#756B5B;">
+                    Publicando como <strong>{{ current_user.nombre_usuario }}</strong>
+                </p>
+                <form method="POST" style="display:flex; flex-direction:column; gap:16px;">
+
+                    <div>
+                        <label>Provincia</label><br>
+                        <input type="text" name="provincia" required
+                            style="width:100%; padding:10px; margin-top:5px; border:2px solid #2B2620; border-radius:10px; font-family:'Nunito', sans-serif;">
+                    </div>
+
+                    <div>
+                        <label>Tipo de publicación</label><br>
+                        <select name="tipo" required
+                            style="width:100%; padding:10px; margin-top:5px; border:2px solid #2B2620; border-radius:10px; font-family:'Nunito', sans-serif;">
+                            <option value="denuncia">Denuncia</option>
+                            <option value="meme">Meme</option>
+                            <option value="gobierno">Gobierno</option>
+                            <option value="infraestructura">Infraestructura</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label>Título</label><br>
+                        <input type="text" name="titulo" required
+                            style="width:100%; padding:10px; margin-top:5px; border:2px solid #2B2620; border-radius:10px; font-family:'Nunito', sans-serif;">
+                    </div>
+
+                    <div>
+                        <label>Contenido</label><br>
+                        <textarea name="contenido" rows="5" required
+                            style="width:100%; padding:10px; margin-top:5px; border:2px solid #2B2620; border-radius:10px; font-family:'Nunito', sans-serif;"></textarea>
+                    </div>
+
+                    <div>
+                        <label>URL de imagen (opcional)</label><br>
+                        <input type="url" name="imagen" placeholder="https://..."
+                            style="width:100%; padding:10px; margin-top:5px; border:2px solid #2B2620; border-radius:10px; font-family:'Nunito', sans-serif;">
+                    </div>
+
+                    <button type="submit" class="btn-principal" style="margin-top:0;">
+                        Publicar
+                    </button>
+
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>VozRD — Periodismo ciudadano dominicano</p>
+        <small>Cada ciudadano es un reportero</small>
+    </footer>
+
+</body>
+</html>
